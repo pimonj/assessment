@@ -42,6 +42,8 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
+	e.GET("/expenses/:id", getExpense)
+
 	port := os.Getenv("PORT")
 	if port != "2565" {
 		e.Logger.Fatal("Server should be start at port:2565", err)		
