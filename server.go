@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -22,6 +23,10 @@ var db *sql.DB
 func main() {
 	var err error
 	url := os.Getenv("DATABASE_URL")
+	if len(url) == 0 {
+		log.Fatal("Not found DATABASE_URL", err)
+	}
+
 	db, err = sql.Open("postgres", url)
 
 	if err != nil {
@@ -43,12 +48,19 @@ func main() {
 	e.Use(middleware.Recover())
 
 	port := os.Getenv("PORT")
-	if port != "2565" {
-		e.Logger.Fatal("Server should be start at port:2565", err)		
+	fmt.Println("PORT =", port)
+	
+	if len(port) == 0 {
+		e.Logger.Info("Server will be start at port:2565", err)		
+		port = ":2565"
+	}
+
+	if !strings.HasPrefix(port, ":") {
+		port = ":" + port
 	}
 
 	go func() {
-		if err := e.Start(":2565"); err != nil && err != http.ErrServerClosed {
+		if err := e.Start(port); err != nil && err != http.ErrServerClosed {
 			e.Logger.Fatal("Shutting down the server")
 		}
 	}()
