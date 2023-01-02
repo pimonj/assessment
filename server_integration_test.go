@@ -35,7 +35,7 @@ func uri(paths ...string) string {
 
 }
 
-func TestAddUser(t *testing.T) {
+func TestAddExpense(t *testing.T) {
 
 	var e ResExpense
 	body := bytes.NewBufferString(`{
