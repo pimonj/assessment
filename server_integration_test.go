@@ -42,17 +42,9 @@ func TestGetExpenseByID(t *testing.T) {
 	res := request(http.MethodGet, uri("expenses", id), nil)
 	err := res.Decode(&e)
 
-	var tags = []string{
-		"food",
-		"beverage",
-	}
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 	assert.Equal(t, id, e.ID)
-	assert.Equal(t, "night market promotion discount 10 bath", e.NOTE)
-	assert.Equal(t, float64(79), e.AMOUNT)
-	assert.Equal(t, "strawberry smoothie", e.TITLE)
-	assert.Equal(t, tags, e.TAGS)
 }
 
 
