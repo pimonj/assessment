@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
-	"strconv"
 	"strings"
 	"testing"
 
@@ -38,8 +37,9 @@ func uri(paths ...string) string {
 func TestGetExpenseByID(t *testing.T) {
 
 	var e ResExpense
+	id := "1"
 
-	res := request(http.MethodGet, uri("expenses",strconv.Itoa(1)), nil)
+	res := request(http.MethodGet, uri("expenses", id), nil)
 	err := res.Decode(&e)
 
 	var tags = []string{
@@ -48,12 +48,11 @@ func TestGetExpenseByID(t *testing.T) {
 	}
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusOK, res.StatusCode)
-	assert.Equal(t, "1", e.ID)
+	assert.Equal(t, id, e.ID)
 	assert.Equal(t, "night market promotion discount 10 bath", e.NOTE)
 	assert.Equal(t, float64(79), e.AMOUNT)
 	assert.Equal(t, "strawberry smoothie", e.TITLE)
 	assert.Equal(t, tags, e.TAGS)
-
 }
 
 
