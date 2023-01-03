@@ -50,7 +50,7 @@ func TestUpdateExpense(t *testing.T) {
 	res := request(http.MethodPut, uri("expenses", id), body)
 	err := res.Decode(&e)
 	if err != nil {
-		t.Fatal("can't create expense:", err.Error())
+		t.Fatal("can't update expense:", err.Error())
 	}
 
 	var tags = []string{
