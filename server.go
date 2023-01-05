@@ -50,6 +50,8 @@ func main() {
 
 	e.POST("/expenses", addExpense)
 	e.GET("/expenses/:id", getExpense)
+	e.PUT("/expenses/:id", updateExpense)
+
 
 	port := os.Getenv("PORT")
 	fmt.Println("PORT =", port)

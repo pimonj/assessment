@@ -1,4 +1,5 @@
 //go:build integration
+
 package main
 
 import (
@@ -35,6 +36,7 @@ func uri(paths ...string) string {
 	return strings.Join(url, "/")
 
 }
+
 
 func TestAddExpense(t *testing.T) {
 
@@ -77,6 +79,36 @@ func TestGetExpenseByID(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 	assert.Equal(t, id, e.ID)
+}
+
+func TestUpdateExpense(t *testing.T) {
+
+	var e ResExpense
+	body := bytes.NewBufferString(`{
+		"amount": 1500,
+		"note": "black friday discount 45%",
+		"title": "sweater",
+		"tags": ["clothes"]
+	}`)
+
+	id := "1"
+
+	res := request(http.MethodPut, uri("expenses", id), body)
+	err := res.Decode(&e)
+	if err != nil {
+		t.Fatal("can't update expense:", err.Error())
+	}
+
+	var tags = []string{
+		"clothes",
+	}
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
+	assert.Equal(t, id, e.ID)
+	assert.Equal(t, "black friday discount 45%", e.NOTE)
+	assert.Equal(t, float64(1500), e.AMOUNT)
+	assert.Equal(t, "sweater", e.TITLE)
+	assert.Equal(t, tags, e.TAGS)
 }
 
 
