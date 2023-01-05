@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	//"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 type Response struct {
@@ -35,31 +35,33 @@ func uri(paths ...string) string {
 
 }
 
-func TestAddUser(t *testing.T) {
+func TestAddExpense(t *testing.T) {
 
-	var res ResExpense
+	var e ResExpense
 	body := bytes.NewBufferString(`{
-		"amount": 407,
-		"note": "delivery",
-		"title": "pizza",
-		"tags": ["food"]
+		"amount": 79,
+		"note": "night market promotion discount 10 bath",
+		"title": "strawberry smoothie",
+		"tags": ["food", "beverage"]
 	}`)
 
-	err := request(http.MethodPost, uri("expenses"), body).Decode(&res)
+	res := request(http.MethodPost, uri("expenses"), body)
+	err := res.Decode(&e)
 	if err != nil {
 		t.Fatal("can't create expense:", err.Error())
 	}
 
-	// var tags = []string{
-	// 	"food",
-	// }
-	// assert.Nil(t, err)
-	// assert.Equal(t, http.StatusCreated, r)
-	// assert.NotEqual(t, 0, res.ID)
-	// assert.Equal(t, "delivery", res.NNOTE)
-	// assert.Equal(t, 407, res.AMOUNT)
-	// assert.Equal(t, "pizza", res.TITLE)
-	// assert.Equal(t, tags, res.TTAGS)
+	var tags = []string{
+		"food",
+		"beverage",
+	}
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusCreated, res.StatusCode)
+	assert.NotEqual(t, 0, e.ID)
+	assert.Equal(t, "night market promotion discount 10 bath", e.NOTE)
+	assert.Equal(t, float64(79), e.AMOUNT)
+	assert.Equal(t, "strawberry smoothie", e.TITLE)
+	assert.Equal(t, tags, e.TAGS)
 
 }
 
