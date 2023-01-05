@@ -47,7 +47,9 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
+
 	e.POST("/expenses", addExpense)
+	e.GET("/expenses/:id", getExpense)
 
 	port := os.Getenv("PORT")
 	fmt.Println("PORT =", port)

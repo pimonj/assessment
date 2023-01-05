@@ -1,3 +1,4 @@
+//go:build integration
 package main
 
 import (
@@ -63,6 +64,19 @@ func TestAddExpense(t *testing.T) {
 	assert.Equal(t, "strawberry smoothie", e.TITLE)
 	assert.Equal(t, tags, e.TAGS)
 
+}
+
+func TestGetExpenseByID(t *testing.T) {
+
+	var e ResExpense
+	id := "1"
+
+	res := request(http.MethodGet, uri("expenses", id), nil)
+	err := res.Decode(&e)
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
+	assert.Equal(t, id, e.ID)
 }
 
 
