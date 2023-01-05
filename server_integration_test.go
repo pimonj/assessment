@@ -37,7 +37,6 @@ func uri(paths ...string) string {
 
 }
 
-
 func TestAddExpense(t *testing.T) {
 
 	var e ResExpense
@@ -109,6 +108,20 @@ func TestUpdateExpense(t *testing.T) {
 	assert.Equal(t, float64(1500), e.AMOUNT)
 	assert.Equal(t, "sweater", e.TITLE)
 	assert.Equal(t, tags, e.TAGS)
+}
+func TestGetAllExpense(t *testing.T) {
+
+	var e []ResExpense
+
+	res := request(http.MethodGet, uri("expenses"), nil)
+	err := res.Decode(&e)
+	if err != nil {
+		t.Fatal("can't get all expense:", err.Error())
+	}
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
+	assert.Greater(t, len(e), 0)
 }
 
 

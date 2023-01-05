@@ -47,7 +47,6 @@ func getExpense(c echo.Context) (err error) {
 	}
 
 	row := stmt.QueryRow(id)
-
 	err = row.Scan(&res.ID, &res.TITLE, &res.AMOUNT, &res.NOTE, (*pq.StringArray)(&res.TAGS))
 	if err != nil {
 		log.Println("getExpense is error", err)
@@ -60,6 +59,7 @@ func getExpense(c echo.Context) (err error) {
 func updateExpense(c echo.Context) (err error) {
 	c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSONCharsetUTF8)
 
+	req := new(ReqExpense)
 	res := new(ResExpense)
 
 	uri := strings.Split(c.Request().RequestURI, "/")
@@ -78,6 +78,33 @@ func updateExpense(c echo.Context) (err error) {
 	if err != nil {
 		log.Println("Update expense is error", err)
 		return c.JSON(http.StatusInternalServerError, "Update expense is error")
+	}
+
+	return c.JSON(http.StatusOK, res)
+}
+
+func getAllExpense(c echo.Context) (err error) {
+	c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSONCharsetUTF8)
+		
+	var res []ResExpense
+		
+	stmt, err := db.Prepare("SELECT id, title, amount, note, tags FROM expenses")
+
+	row, err := stmt.Query()
+	if err != nil {
+		log.Println("Query is error", err)
+		return c.JSON(http.StatusInternalServerError, "Query is error")
+	}
+
+	for row.Next() {
+		var r ResExpense
+		err = row.Scan(&r.ID, &r.TITLE, &r.AMOUNT, &r.NOTE, (*pq.StringArray)(&r.TAGS))
+		if err != nil {
+			log.Println("Get data is error", err)
+			return c.JSON(http.StatusInternalServerError, "Get data is error")
+		}
+
+		res = append(res, r)
 	}
 
 	return c.JSON(http.StatusOK, res)
