@@ -14,6 +14,7 @@ import (
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	"github.com/pimonj/assessment/auth"
 
 	_ "github.com/lib/pq"
 )
@@ -22,6 +23,7 @@ var db *sql.DB
 
 func main() {
 	var err error
+
 	url := os.Getenv("DATABASE_URL")
 	if len(url) == 0 {
 		log.Fatal("Not found DATABASE_URL", err)
@@ -46,11 +48,14 @@ func main() {
 
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
+	e.Use(auth.Authentication)
 
-	e.POST("/expenses", AddExpense)
-	e.GET("/expenses/:id", GetExpense)
-	e.PUT("/expenses/:id", UpdateExpense)
-	e.GET("/expenses", GetAllExpense)
+	g := e.Group("/expenses")
+
+	g.POST("", AddExpense)
+	g.GET("/:id", GetExpense)
+	g.PUT("/:id", UpdateExpense)
+	g.GET("", GetAllExpense)
 
 	port := os.Getenv("PORT")
 	fmt.Println("PORT =", port)

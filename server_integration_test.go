@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"strings"
 	"testing"
-
+	"os"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -21,6 +21,7 @@ type Response struct {
 func request(method, url string, body io.Reader) *Response {
 	req, _ := http.NewRequest(method, url, body)
 	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("Authorization", os.Getenv("AUTH_TOKEN"))
 	client := http.Client{}
 	res, err := client.Do(req)
 	return  &Response{res, err}
@@ -38,7 +39,6 @@ func uri(paths ...string) string {
 }
 
 func TestAddExpense(t *testing.T) {
-
 	var e ResExpense
 	body := bytes.NewBufferString(`{
 		"amount": 79,
@@ -64,24 +64,21 @@ func TestAddExpense(t *testing.T) {
 	assert.Equal(t, float64(79), e.AMOUNT)
 	assert.Equal(t, "strawberry smoothie", e.TITLE)
 	assert.Equal(t, tags, e.TAGS)
-
 }
 
 func TestGetExpenseByID(t *testing.T) {
+	c := seedExpense(t)
 
 	var e ResExpense
-	id := "1"
-
-	res := request(http.MethodGet, uri("expenses", id), nil)
+	res := request(http.MethodGet, uri("expenses", c.ID), nil)
 	err := res.Decode(&e)
 
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusOK, res.StatusCode)
-	assert.Equal(t, id, e.ID)
+	assert.Equal(t, c.ID, e.ID)
 }
 
 func TestUpdateExpense(t *testing.T) {
-
 	var e ResExpense
 	body := bytes.NewBufferString(`{
 		"amount": 1500,
@@ -109,8 +106,8 @@ func TestUpdateExpense(t *testing.T) {
 	assert.Equal(t, "sweater", e.TITLE)
 	assert.Equal(t, tags, e.TAGS)
 }
-func TestGetAllExpense(t *testing.T) {
 
+func TestGetAllExpense(t *testing.T) {
 	var e []ResExpense
 
 	res := request(http.MethodGet, uri("expenses"), nil)
@@ -122,6 +119,25 @@ func TestGetAllExpense(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 	assert.Greater(t, len(e), 0)
+}
+
+
+func seedExpense(t *testing.T) ResExpense {
+	var e ResExpense
+	body := bytes.NewBufferString(`{
+		"amount": 79,
+		"note": "night market promotion discount 10 bath",
+		"title": "strawberry smoothie",
+		"tags": ["food", "beverage"]
+	}`)
+
+	res := request(http.MethodPost, uri("expenses"), body)
+	err := res.Decode(&e)
+	if err != nil {
+		t.Fatal("can't create expense:", err.Error())
+	}
+
+	return e
 }
 
 
